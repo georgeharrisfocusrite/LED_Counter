@@ -21,7 +21,7 @@ class Image:
         self.show = show
 
         if caption is None:
-            caption = ''
+            caption = 'original image'
         self.caption = caption
 
         self.thresh=thresh
@@ -37,14 +37,14 @@ class Image:
     @property
     def grayed(self):
         # convert to b&w
-        return Image( image=cv2.cvtColor(self.image, cv2.COLOR_RGB2GRAY), caption='grayscale image', thresh=self.thresh, scale=self.scale, blur=self.blur )
+        return Image( image=cv2.cvtColor(self.image, cv2.COLOR_RGB2GRAY), caption='grayscale image', thresh=self.thresh, scale=self.scale, blur=self.blur, channels = 'gray' )
 
     @property
     def blurred(self):
         if self.blur % 2 == 0:
             self.blur += 1
         # apply gaussian blur
-        return Image( cv2.GaussianBlur(self.image, (self.blur, self.blur), 0), caption='blurred image', thresh=self.thresh, scale=self.scale, blur=self.blur )
+        return Image( cv2.GaussianBlur(self.image, (self.blur, self.blur), 0), caption='blurred image', thresh=self.thresh, scale=self.scale, blur=self.blur, channels = self.channels )
 
     @property
     def threshold(self):
@@ -54,10 +54,11 @@ class Image:
         thresh = cv2.dilate(thresh, None, iterations=self.dilate_itr)
         return thresh
 
+    # TODO fix masked image being grayscale underneath
     @property
     def masked(self):
         # use thresh to mask original image
-        return cv2.bitwise_and(self.image, self.image, mask=self.threshold)
+        return Image( cv2.bitwise_and(self.image, self.image, mask=self.threshold), caption='masked image', thresh=self.thresh, scale=self.scale, blur=self.blur, channels = self.channels )
 
     @property
     def countleds(self):

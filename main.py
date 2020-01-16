@@ -8,10 +8,11 @@ def load_image(path, caption=None, channels='BGR'):
     width = 800
     return st.image(path, caption=caption, width=width, use_column_width=False, clamp=False, channels=channels, format='JPEG')
 
-def build_ui(im):
+def build_ui(images):
     st.sidebar.title('Show Images')
-    if st.sidebar.checkbox(im.caption, value=im.show):
-        load_image(im.image, caption=im.caption, channels=im.channels)
+    for im in images:
+        if st.sidebar.checkbox(im.caption, value=im.show):
+            load_image(im.image, caption=im.caption, channels=im.channels)
 
 def sliders():
     st.sidebar.title('Variables')
@@ -22,7 +23,8 @@ def sliders():
         }
     return slider_values
 
-def result(image):
+def result(images):
+    image = images[0]
     gray = image.grayed
     blur = gray.blurred
     blobs = blur.countleds
@@ -56,9 +58,13 @@ def dropdown(path):
 
 slider_values = sliders()
 
+
+
 # load image
 image = Image( image_path=dropdown(Path('images')), thresh=slider_values['thresh'], scale=slider_values['scale'], blur=slider_values['blur'] )
 
-result(image)
+images = [image, image.grayed, image.grayed.blurred, image.grayed.blurred.masked]
 
-build_ui(image)
+result(images)
+
+build_ui(images)
