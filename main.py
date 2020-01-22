@@ -19,14 +19,16 @@ def sliders():
     slider_values = {
         'scale': st.sidebar.slider('image scale', 0.01, 1.0, 1.0),
         'blur': st.sidebar.slider('blur', 2, 40, 2, step=2) - 1,
-        'thresh': st.sidebar.slider('low brightness threshold', 1, 254, 140)
+        'thresh': st.sidebar.slider('low brightness threshold', 1, 254, 140),
+        'blob size': st.sidebar.slider('minimum blob area (pixels)', 1, 1000, 300)
         }
     return slider_values
 
-def result(images):
+def result(images, blob_size):
     image = images[0]
     gray = image.grayed
     blur = gray.blurred
+    blur.blob_size = blob_size
     blobs = blur.countleds
     expected = 512
     detected = blobs
@@ -61,10 +63,10 @@ slider_values = sliders()
 
 
 # load image
-image = Image( image_path=dropdown(Path('images')), thresh=slider_values['thresh'], scale=slider_values['scale'], blur=slider_values['blur'] )
+image = Image( image_path=dropdown(Path('images')), thresh=slider_values['thresh'], scale=slider_values['scale'], blur=slider_values['blur'], blob_size=slider_values['blob size'] )
 
 images = [image, image.grayed, image.grayed.blurred, image.grayed.blurred.masked]
 
-result(images)
+result(images, slider_values['blob size'])
 
 build_ui(images)

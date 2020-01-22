@@ -2,7 +2,7 @@ import cv2
 import imutils.contours
 
 class Image:
-    def __init__(self, image=None, image_path=None, channels=None, show=None, caption=None, thresh=170, erode_itr=2, dilate_itr=4, scale=1, blur=3):
+    def __init__(self, image=None, image_path=None, channels=None, show=None, caption=None, thresh=170, erode_itr=2, dilate_itr=4, scale=1, blur=3, blob_size=500):
 
         if image is None:
             if image_path is None:
@@ -29,6 +29,7 @@ class Image:
         self.erode_itr=erode_itr
         self.dilate_itr=dilate_itr
         self.blur=blur
+        self.blob_size=blob_size
 
     def resize(self, x_scale, y_scale):
         # resize image
@@ -64,4 +65,4 @@ class Image:
     def countleds(self):
         # count LEDs
         cnts = cv2.findContours(self.threshold, cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
-        return len(imutils.grab_contours(cnts))
+        return len([cnt for cnt in imutils.grab_contours(cnts) if cv2.contourArea(cnt) > self.blob_size])
